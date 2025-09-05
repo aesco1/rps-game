@@ -1,44 +1,66 @@
-playGame();
-
 function playGame(){
     let humanScore = 0;
     let computerScore = 0;
-    let pcChoice;
-    let humanChoice;
+    const MAXSCORE = 5;
+    let gameActive = true;
 
-    //run for five rounds
-    for (let i = 0; i < 5; i++){
-        //gets pc choice
-        let random = Math.floor(Math.random() * 3);
-        pcChoice = getPcChoice(random);
+    console.log("playGame() started");
 
-        //get user choice
-        humanChoice = getHumanChoice();
+    // event listener for all 3 buttons
+    let gameButtons = document.querySelector(".game-buttons");
+    const results = document.querySelector(".results");
 
-        //determine winner
-        let roundWinner = playRound(humanChoice, pcChoice);
+    console.log("gameButtons:", gameButtons);
+    console.log("results:", results);
 
-        if (roundWinner == "h"){
-            humanScore++;
-            alert("User wins this round!");
-        }
-        else if (roundWinner == "c"){
-            computerScore++;
-            alert("Computer wins this round!");
-        }
-        else{
-            alert("Its a tie!");
-        }
+    if (!gameButtons) {
+        console.error("gameButtons not found!");
+        return;
+    }
+    if (!results) {
+        console.error("results element not found!");
+        return;
     }
 
-    //display results
-    declareWinner(humanScore, computerScore);
-}
+    gameButtons.addEventListener('click', (event) =>{
+        console.log("Button clicked!", event.target.id);
+        console.log("results inside click:", results);
 
-function getHumanChoice(){
-    let userInput = prompt("Choose one rock, paper, or scissor: ")
-    userInput = userInput.toLowerCase();
-    return userInput;
+        //Checks to see if game is over
+        if (!gameActive) return;
+
+        let target = event.target;
+
+        //gets pc choice
+        let random = Math.floor(Math.random() * 3);
+        let pcChoice = getPcChoice(random);
+        let humanChoice = target.id
+        //Play round
+        let roundWinner = playRound(humanChoice, pcChoice);
+
+        //determine winner
+        if (roundWinner === "h"){
+            humanScore++;
+        }
+        else if (roundWinner === "c"){
+            computerScore++;
+        }
+        
+        //display Results
+        results.textContent = `YOU CHOSE ${humanChoice.toUpperCase()}
+        COMPUTER CHOSE ${pcChoice.toUpperCase()}.
+        SCORE: YOU ${humanScore} | COMPUTER ${computerScore}`;
+
+        //Check for a gamer winner
+        if (humanScore === MAXSCORE){
+            results.textContent = "🎉 YOU WIN THE GAME! 🎉";
+            gameActive = false;
+        } else if (computerScore === MAXSCORE){
+            results.textContent = "COMPUTER WINS THE GAME!";
+            gameActive = false;
+        }
+    });
+        
 }
 
 function playRound(humanChoice, computerChoice){ 
@@ -80,25 +102,7 @@ function getPcChoice(randomNum){
     return converted;
 }
 
-function declareWinner(hScore, cScore){
-    if (hScore > cScore){
-        console.log("User wins with a score of " + hScore);
-    }
-    else{
-        console.log("Computer wins with a score of " + cScore);
-    }
-}
- 
-
-/*
-ROCK PAPER SCISSORS
-pc pick between rock paper or scissor
-if same choice go again
-     ask user for another choice and get new pc picj
-     continue until different
-if different announce winner
-rock beats scissor: 0 beats 2
-scissor beats paper: 2 beats 1
-paper beats rock: 1 beats 0
-
-*/
+// Make sure this runs after DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    playGame();
+});
